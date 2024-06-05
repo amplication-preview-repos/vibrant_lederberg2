@@ -1,0 +1,87 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Member {
+  address          String?
+  appointments     Appointment[]
+  attendances      Attendance[]
+  createdAt        DateTime          @default(now())
+  customerSupports CustomerSupport[]
+  dateOfBirth      DateTime?
+  email            String?
+  firstName        String?
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  lastName         String?
+  membership       Membership?       @relation(fields: [membershipId], references: [id])
+  membershipId     String?           @db.ObjectId
+  phone            String?
+  updatedAt        DateTime          @updatedAt
+}
+
+model Membership {
+  createdAt DateTime  @default(now())
+  duration  Int?
+  endDate   DateTime?
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  members   Member[]
+  price     Float?
+  startDate DateTime?
+  typeField String?
+  updatedAt DateTime  @updatedAt
+}
+
+model Attendance {
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  createdAt    DateTime  @default(now())
+  date         DateTime?
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  member       Member?   @relation(fields: [memberId], references: [id])
+  memberId     String?   @db.ObjectId
+  updatedAt    DateTime  @updatedAt
+}
+
+model Appointment {
+  createdAt DateTime  @default(now())
+  date      DateTime?
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  member    Member?   @relation(fields: [memberId], references: [id])
+  memberId  String?   @db.ObjectId
+  service   String?
+  timeSlot  String?
+  trainer   String?
+  updatedAt DateTime  @updatedAt
+}
+
+model CustomerSupport {
+  createdAt  DateTime                   @default(now())
+  id         String                     @id @default(auto()) @map("_id") @db.ObjectId
+  issue      String?
+  member     Member?                    @relation(fields: [memberId], references: [id])
+  memberId   String?                    @db.ObjectId
+  resolution String?
+  status     EnumCustomerSupportStatus?
+  updatedAt  DateTime                   @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumCustomerSupportStatus {
+  Option1
+}
